@@ -2,31 +2,38 @@
     "myBudget": [
       {
         "title": "Eat out",
-        "budget": 25
+        "budget": 25,
+        "range": "#98abc5"
       },
       {
         "title": "Rent",
-        "budget": 375
+        "budget": 375,
+        "range": "#228B22"
       },
       {
         "title": "Grocery",
-        "budget": 110
+        "budget": 110,
+        "range": "#FFA500"
       },
       {
         "title": "Pet Budget",
-        "budget": 150
+        "budget": 150,
+        "range": "#6b486b"
       },
       {
         "title": "Electricity",
-        "budget": 100
+        "budget": 100,
+        "range": "#a05d56"
       },
       {
         "title": "Shopping",
-        "budget": 100
+        "budget": 100,
+        "range": "#d0743c"
       },
       {
         "title": "Water Bill",
-        "budget": 70
+        "budget": 70,
+        "range": "#ff8c00"
       }
     ]
   }

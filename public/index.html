@@ -7,6 +7,44 @@
     <title>Personal Budget</title>
     <link rel="stylesheet" href="./reset.css">
     <link rel="stylesheet" href="./main.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <!-- Pie chart styling -->
+    <style>
+
+        body {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          width: 960px;
+          height: 500px;
+          position: relative;
+        }
+        
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+           margin: auto;
+        }
+        
+        path.slice{
+            stroke-width:2px;
+        }
+        
+        polyline{
+            opacity: .3;
+            stroke: black;
+            stroke-width: 2px;
+            fill: none;
+        }       
+
+        .legend {                                                  
+        font-size: 12px;                                          
+        }                                                           
+         rect {                                             
+        stroke-width: 2;                      
+        }  
+        
+        </style>
 </head>
 
 
@@ -121,26 +159,13 @@
                         <canvas id="myChart" width="400" height="400"></canvas>
                     </p>
                 </div>
-
-            </div>
-
-    </div>
-    </main>
-
-    <!-- This is a Semantic HTML Change -->
-    <!-- This is an A11y Change -->
-        <footer class = "bottom" role="Footer">
-            <div class="center">
-                <!-- This is an SEO Change -->
-                <a href="./sitemap.html">Sitemap</a><br>
-                <!-- This is an SEO Change -->
-                <!-- Reference: https://www.xml-sitemaps.com-->
-                <a href="./sitemap.xml">XML Sitemap</a><br>
-                All rights reserved &copy; Fabio Nolasco
-            </div>
-        </footer>
+         </div>
+         </div>
+     </main>
 
         <?xml version="1.0" encoding="UTF-8"?>
+
+        <svg width="300" height="250"> </svg>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script>
@@ -154,6 +179,9 @@
                         '#ff6384',
                         '#36a2eb',
                         '#fd6b19',
+                        '#7b6888',
+                        '#6b486b',
+                        '#98abc5'
                     ],
                  }
              ], 
@@ -180,8 +208,129 @@
             });
         }
         getBudget();
+
+        //donut chart
+        var dataSource1 = {
+                    range: [],
+                    data: [],
+                    labels: [],
+                    legendData: []
+                    };
+
+        var legendRectSize = 18;                                  
+        var legendSpacing = 4;                                    
+
+            function getBudgetData(){
+                axios.get('./budget')
+                .then(function (res) {
+                    console.log(res);
+                    
+                    for(var i = 0; i < res.data.myBudget.length; i++) {
+                        dataSource1.data[i] = res.data.myBudget[i].budget;
+                        dataSource1.labels[i] = res.data.myBudget[i].title;
+                        dataSource1.range[i]= res.data.myBudget[i].range;
+                        dataSource1.legendData[i]= res.data.myBudget[i].title + " : " + res.data.myBudget[i].budget;
+                        console.log('datasource1', dataSource1.data[i]);
+                        console.log('datasource1', dataSource1.labels[i]);
+                        console.log('datasource1', dataSource1.range[i]);
+                    }
+                    createChart1();
+                });
+            }
+            getBudgetData();
+        
+        function createChart1(){
+
+            var data = dataSource1.data;
+
+            console.log('dataSource1.data', dataSource1.data[0]);
+            console.log('data', data[0]);
+
+            var svg = d3.select("svg"),
+                width = svg.attr("width"),
+                height = svg.attr("height"),
+                radius = Math.min(width, height) / 2,
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            var color = d3.scaleOrdinal(dataSource1.range);
+
+            // Generate the pie
+            var pie = d3.pie();
+
+            // Generate the arcs
+            var arc = d3.arc()
+                        .innerRadius(50)
+                        .outerRadius(radius);
+
+            var label = d3.arc()
+                    .outerRadius(radius)
+                    .innerRadius(radius - 80);
+
+            //Generate groups
+            var arcs = g.selectAll("arc")
+                        .data(pie(data))
+                        .enter()
+                        .append("g")
+                        .attr("class", "arc")
+
+            //Draw arc paths
+            arcs.append("path")
+                .attr("fill", function(d, i) {
+                    return color(i);
+                })
+                .attr("d", arc);
+
+            arcs.append("text")
+                .attr("transform", function(d) { 
+                        return "translate(" + label.centroid(d) + ")"; 
+                })   
+                .text(function(d) { return dataSource1.labels[d]; });
+
+            svg.append("g")
+            .attr("transform", "translate(" + (width / 2 - 130) + "," + 15 + ")")
+            .append("text")
+            .text("Budget Data")
+            .attr("class", "title")
+
+          //create legend
+          var legend = svg.selectAll('.legend')                    
+          .data(dataSource1.legendData)                                  
+          .enter()                                            
+          .append('g')                                      
+          .attr('class', 'legend')                          
+          .attr('transform', function(d, i) {                    
+            var height = legendRectSize + legendSpacing;         
+            var offset =  height * color.domain().length / 2;     
+            var horz = 20 * legendRectSize;                  
+            var vert = i * height;                      
+            return 'translate(' + horz + ',' + vert + ')';      
+          });                                                     
+
+        legend.append('rect')                                     
+          .attr('width', legendRectSize)                       
+          .attr('height', legendRectSize)                         
+          .style('fill', color)                                   
+          .style('stroke', color);                            
+          
+        legend.append('text')                                   
+          .attr('x', legendRectSize + legendSpacing)            
+          .attr('y', legendRectSize - legendSpacing)             
+          .text(function(d) { return d; });    
+         }         
         </script>
 
+    <!-- This is a Semantic HTML Change -->
+    <!-- This is an A11y Change -->
+    <footer class = "bottom" role="Footer">
+        <div class="center">
+            <!-- This is an SEO Change -->
+            <a href="./sitemap.html">Sitemap</a><br>
+            <!-- This is an SEO Change -->
+            <!-- Reference: https://www.xml-sitemaps.com-->
+            <a href="./sitemap.xml">XML Sitemap</a><br>
+            All rights reserved &copy; Fabio Nolasco
+        </div>
+    </footer>
     </body>
 
 </html> 
