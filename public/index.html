@@ -197,7 +197,7 @@
         }
 
         function getBudget(){
-            axios.get('/budget')
+            axios.get('http://localhost:3002/budget')
             .then(function (res) {
                 console.log(res);
                 for(var i = 0; i < res.data.myBudget.length; i ++) {
@@ -221,7 +221,7 @@
         var legendSpacing = 4;                                    
 
             function getBudgetData(){
-                axios.get('./budget')
+                axios.get('http://localhost:3002/budget')
                 .then(function (res) {
                     console.log(res);
                     
