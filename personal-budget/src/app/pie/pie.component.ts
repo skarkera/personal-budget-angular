@@ -83,10 +83,10 @@ private drawChart(): void {
 }
 
   constructor(public dataService: DataServiceService) {
-
   }
 
   ngOnInit(): void {
+
     this.createSvg();
     this.createColors();
     this.drawChart();

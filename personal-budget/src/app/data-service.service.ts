@@ -5,11 +5,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class DataServiceService {
-  public dataSource1 = {
-   // range: [],
+  public  dataSource1 = {
     data: [],
-    labels: [],
-   // legendData: []
+    labels: []
     };
 
   constructor(private http: HttpClient) {
